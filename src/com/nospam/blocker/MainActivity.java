@@ -7,6 +7,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
+import android.text.style.URLSpan;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -61,6 +66,16 @@ public class MainActivity extends Activity {
         statusText = new TextView(this);
         statusText.setTextSize(14);
 
+        SpannableString footerText = new SpannableString("by fdavid");
+        footerText.setSpan(new URLSpan("https://www.fdavid.com.br"), 0, footerText.length(),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        TextView footer = new TextView(this);
+        footer.setText(footerText);
+        footer.setMovementMethod(LinkMovementMethod.getInstance());
+        footer.setGravity(Gravity.RIGHT);
+        footer.setTextSize(12);
+        footer.setPadding(0, 32, 0, 0);
+
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setPadding(48, 48, 48, 48);
@@ -68,6 +83,7 @@ public class MainActivity extends Activity {
         root.addView(contactsBtn);
         root.addView(roleBtn);
         root.addView(statusText);
+        root.addView(footer);
         setContentView(root);
 
         updateStatus();
@@ -124,7 +140,22 @@ public class MainActivity extends Activity {
         }
         sb.append("\n\nSamsung: se chamadas fora da agenda ainda tocarem, desative a "
                 + "'Protecao de identificador de chamadas' no app Telefone.");
+        appendDiagnostic(sb);
         statusText.setText(sb.toString());
+    }
+
+    private void appendDiagnostic(StringBuilder sb) {
+        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+        String number = prefs.getString("diag_number", null);
+        if (number == null) {
+            return;
+        }
+        sb.append("\n\n--- Ultima triagem ---\n");
+        sb.append("Numero: ").append(number).append('\n');
+        sb.append("Digitos: ").append(prefs.getString("diag_digits", "")).append('\n');
+        sb.append("Contatos lidos: ").append(prefs.getInt("diag_contacts_read", -1)).append('\n');
+        sb.append("Consulta: ").append(prefs.getString("diag_query", "")).append('\n');
+        sb.append("Resultado: ").append(prefs.getString("diag_result", ""));
     }
 
     @Override
