@@ -1,4 +1,10 @@
 build/
 sdk/
 *.apk
-*.jks
+*.jks.claude
+.codex
+.cursor
+opencode.json
+.claude
+.agents-bootstrap
+AGENTS.md
